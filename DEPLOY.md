@@ -147,8 +147,24 @@ Se estiverem faltando, marque na interface ou rode `0004_realtime.sql` de novo.
 
 | Campo no painel | Vai para |
 |---|---|
-| Project URL | `NEXT_PUBLIC_SUPABASE_URL` |
-| Project API keys → `anon` / `public` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| Project URL | `SUPABASE_URL` |
+| Project API keys → `anon` / `public` | `SUPABASE_ANON_KEY` |
+
+> **Por que sem o prefixo `NEXT_PUBLIC_`?** Os dois nomes funcionam — o app
+> aceita ambos. Mas a Vercel classifica variáveis `NEXT_PUBLIC_*` como públicas
+> e pede que você as marque como *Config*, o que nem sempre é óbvio na
+> interface. Sem o prefixo, o valor é lido em tempo de execução no servidor e
+> repassado ao navegador pelo layout — o que tem um bônus: **alterar a variável
+> passa a valer sem precisar de rebuild**.
+>
+> Em ambos os casos os valores chegam ao navegador. É inevitável num app que
+> fala direto com o Supabase pelo cliente, e é para isso que a anon key existe.
+
+> **Cole apenas o valor.** No painel da Vercel, o campo *Key* recebe o nome e o
+> campo *Value* recebe só o valor — sem `=`, sem aspas. Colar
+> `SUPABASE_URL=https://...` inteiro no campo de valor derruba a aplicação; o
+> app detecta isso e mostra uma tela explicando, mas é erro fácil de cometer.
+> O botão de importar `.env` no topo da tela aceita o formato `CHAVE=valor`.
 
 > A `anon key` é **pública por natureza** — ela vai para o navegador de todo
 > mundo. Quem protege os dados é a RLS, não o segredo da chave.
@@ -168,8 +184,8 @@ npm install
 Crie o arquivo `.env.local` na raiz (copie de `.env.example`) e preencha:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_ANON_KEY=sua-anon-key
 ```
 
 ```bash
@@ -220,14 +236,18 @@ git push -u origin main
    **Preview** e **Development**:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_URL
+SUPABASE_ANON_KEY
 ```
 
 4. **Deploy**.
 
 > Se esquecer as variáveis, o build passa mas o site mostra a tela de
-> configuração. Adicione as variáveis e clique em **Redeploy**.
+> configuração dizendo o que falta. Adicione e clique em **Redeploy**.
+
+> Os nomes com prefixo `NEXT_PUBLIC_` também funcionam, mas a Vercel os
+> classifica como públicos e exige marcá-los como *Config* — sem o prefixo
+> você evita esse passo (ver a nota na seção 5).
 
 ### 7.3 Fechar o ciclo com o Supabase
 

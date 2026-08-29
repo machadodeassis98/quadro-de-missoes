@@ -109,6 +109,16 @@ Todas foram encontradas rodando o sistema de verdade, não lendo o código:
 - Ao final de uma sessão relevante, atualize este arquivo com o que mudou de
   arquitetura ou de regra de negócio.
 
+## No ar
+
+- **App:** <https://quadro-de-missoes-peach.vercel.app>
+- **Repositório:** <https://github.com/machadodeassis98/quadro-de-missoes> (público)
+- **Supabase:** projeto `duljydwvovtkqkttbtwf`, região sa-east-1
+
+Fluxo completo validado em produção: cadastro, ficha, missão, inscrição de dois
+jogadores, aprovação, resolução com recompensas individuais, histórico,
+conquistas e Realtime — tudo conferido no banco depois.
+
 ## Estado atual
 
 **Em produção-pronto e verificado contra banco real.** Projeto Supabase
