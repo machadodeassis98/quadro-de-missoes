@@ -27,10 +27,18 @@ function isHttpUrl(value: string): boolean {
   }
 }
 
+/**
+ * A chave não tem formato fixo o bastante para validar de verdade, mas o erro
+ * de colar o nome da variável junto é o mesmo — e sem isto ele passaria daqui
+ * e viraria um 401 obscuro em toda requisição.
+ */
+const keyLooksPasted = rawKey.startsWith("NEXT_PUBLIC_SUPABASE_ANON_KEY=");
+
 export const SUPABASE_URL = rawUrl;
 export const SUPABASE_ANON_KEY = rawKey;
 
-export const isSupabaseConfigured = isHttpUrl(rawUrl) && rawKey.length > 0;
+export const isSupabaseConfigured =
+  isHttpUrl(rawUrl) && rawKey.length > 0 && !keyLooksPasted;
 
 /** O que exatamente está errado, em português, para a tela de configuração. */
 export function supabaseConfigProblem(): string | null {
@@ -45,6 +53,12 @@ export function supabaseConfigProblem(): string | null {
       ? " Parece que o nome da variável foi colado junto com o valor — o campo de valor deve conter só a URL."
       : " O valor precisa começar com https://.";
     return `NEXT_PUBLIC_SUPABASE_URL tem um valor inválido.${parece}`;
+  }
+  if (keyLooksPasted) {
+    return (
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY tem o nome da variável colado junto com o " +
+      "valor — o campo de valor deve conter só a chave."
+    );
   }
   return "NEXT_PUBLIC_SUPABASE_ANON_KEY não está definida.";
 }
