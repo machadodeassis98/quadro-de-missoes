@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Tokens de design — valores idênticos aos do protótipo
+   (quadro-de-missoes.jsx). Não troque os hexadecimais: a identidade
+   visual "taverna" do quadro depende deles.
+   ===================================================================== */
+@theme {
+  --color-ink: #1b1712;
+  --color-ink-soft: #241f17;
+  --color-ink-text: #2a2318;
+  --color-panel: #efe4c8;
+  --color-panel-dark: #e3d5ae;
+  --color-panel-light: #faf5e4;
+  --color-brass: #c9a227;
+  --color-brass-dim: #8c7327;
+  --color-blood: #8c3a32;
+  --color-moss: #3f5d42;
+  --color-muted: #6b5f45;
+  --color-faint: #b8ad8e;
+  --color-faint-dim: #8a7f63;
+
+  --font-display: var(--font-cinzel), "Cinzel", serif;
+  --font-body: var(--font-spectral), "Spectral", serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+}
+
+html {
+  /* O modal de ficha é longo; sem isto o iOS "pula" ao abrir o teclado. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-panel);
+  font-family: var(--font-body);
+  /* O quadro é uma tela escura de taverna — não segue o tema do sistema. */
+  color-scheme: dark;
+}
+
+/* Campos de formulário sobre pergaminho */
+.q-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--color-panel-light);
+  border: 1px solid color-mix(in srgb, var(--color-brass-dim) 40%, transparent);
+  border-radius: 2px;
+  color: var(--color-ink-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+}
+.q-input:focus-visible {
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-brass) 28%, transparent);
+}
+.q-input::placeholder {
+  color: color-mix(in srgb, var(--color-muted) 70%, transparent);
+}
+/* No iOS, fonte < 16px em input dispara zoom automático ao focar. */
+@media (max-width: 640px) {
+  .q-input {
+    font-size: 16px;
+  }
+}
+
+.q-label {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Card de pergaminho */
+.q-panel {
+  background: var(--color-panel);
+  border: 1px solid color-mix(in srgb, var(--color-brass-dim) 33%, transparent);
+  border-radius: 2px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Barra de abas: rolagem horizontal no celular, sem barra visível */
+.q-tabs {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.q-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes q-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.q-spin {
+  animation: q-spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .q-spin {
+    animation-duration: 3s;
+  }
+}
