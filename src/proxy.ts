@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
+import {
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+  isSupabaseConfigured,
+} from "@/lib/supabase/env";
 
 /** Rotas que não exigem sessão. */
 const PUBLIC_PATHS = ["/entrar", "/cadastrar"];
@@ -14,31 +18,44 @@ const PUBLIC_PATHS = ["/entrar", "/cadastrar"];
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  // Sem projeto Supabase configurado não há sessão para renovar nem rota a
-  // proteger — a página inicial mostra as instruções de configuração.
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return response;
+  // Sem projeto Supabase configurado (ou com valor inválido) não há sessão
+  // para renovar nem rota a proteger — as páginas mostram as instruções.
+  if (!isSupabaseConfigured) return response;
 
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value),
-        );
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
-        );
-      },
-    },
-  });
+  let user = null;
 
-  // getUser() (e não getSession()) porque valida o token no servidor.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
+        },
+      },
+    });
+
+    // getUser() (e não getSession()) porque valida o token no servidor.
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch (error) {
+    /*
+     * Esta camada roda em TODA requisição. Se ela lançar, o site inteiro
+     * responde 500 — inclusive as páginas que existem para explicar o
+     * problema. Foi exatamente o que aconteceu num deploy com a variável de
+     * ambiente malformada. Melhor seguir sem sessão: as rotas protegidas
+     * conferem a sessão de novo no servidor, então nada vaza por aqui.
+     */
+    console.error("proxy: falha ao verificar a sessão", error);
+    return response;
+  }
 
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.some(
