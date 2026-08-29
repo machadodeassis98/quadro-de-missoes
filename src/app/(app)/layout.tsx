@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+  isSupabaseConfigured,
+} from "@/lib/supabase/env";
 import { SetupNotice } from "@/components/setup-notice";
 import { BoardProvider } from "@/lib/data/board-provider";
 import { AppNav } from "@/components/app-nav";
@@ -46,7 +50,13 @@ export default async function AppLayout({
   if (!profile) redirect("/entrar");
 
   return (
-    <BoardProvider profile={profile as Profile}>
+    // A URL e a chave vão daqui para o cliente do navegador. É o que permite
+    // as variáveis não terem o prefixo NEXT_PUBLIC_ (ver lib/supabase/env.ts).
+    <BoardProvider
+      profile={profile as Profile}
+      supabaseUrl={SUPABASE_URL}
+      supabaseAnonKey={SUPABASE_ANON_KEY}
+    >
       <div className="min-h-dvh bg-ink">
         <AppNav />
         <main className="max-w-3xl mx-auto px-4 sm:px-5 py-6 pb-24">{children}</main>

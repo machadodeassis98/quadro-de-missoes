@@ -14,10 +14,19 @@ import pg from "pg";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export const DB_URL = process.env.DATABASE_URL ?? "";
+
+// Mesma ordem de preferência do app (ver src/lib/supabase/env.ts): nome
+// dedicado de teste, depois o sem prefixo, depois o com prefixo.
 export const SB_URL =
-  process.env.SUPABASE_TEST_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  process.env.SUPABASE_TEST_URL ??
+  process.env.SUPABASE_URL ??
+  process.env.NEXT_PUBLIC_SUPABASE_URL ??
+  "";
 export const SB_KEY =
-  process.env.SUPABASE_TEST_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  process.env.SUPABASE_TEST_ANON_KEY ??
+  process.env.SUPABASE_ANON_KEY ??
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+  "";
 
 /** A suíte inteira pula quando o ambiente não está configurado. */
 export const integrationReady = Boolean(DB_URL && SB_URL && SB_KEY);

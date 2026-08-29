@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/client";
+import { configureSupabaseClient, createClient } from "@/lib/supabase/client";
 import { loadBoard, QuadroError, type BoardData } from "./api";
 import type { CharacterView, MissionView, Profile } from "@/lib/types/database";
 
@@ -64,11 +64,22 @@ const EMPTY: BoardData = {
 
 export function BoardProvider({
   profile,
+  supabaseUrl,
+  supabaseAnonKey,
   children,
 }: {
   profile: Profile;
+  supabaseUrl: string;
+  supabaseAnonKey: string;
   children: React.ReactNode;
 }) {
+  /*
+   * Configura o cliente do navegador com o que o servidor entregou, antes de
+   * qualquer efeito rodar (efeitos só disparam depois da renderização). É uma
+   * atribuição idempotente de módulo, não estado de React.
+   */
+  configureSupabaseClient(supabaseUrl, supabaseAnonKey);
+
   const [data, setData] = useState<BoardData>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
